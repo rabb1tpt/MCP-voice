@@ -93,6 +93,18 @@ async def list_tools() -> list[Tool]:
                 },
                 "required": []
             }
+        ),
+        Tool(
+            name="listen",
+            description="Record voice and return the transcription as input for processing. "
+                        "Use this when the user wants to speak their request instead of typing. "
+                        "Starts recording immediately - user speaks, presses Enter to stop, and the "
+                        "transcribed text is returned for Claude to process and respond to.",
+            inputSchema={
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
         )
     ]
 
@@ -172,6 +184,57 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
             return [TextContent(
                 type="text",
                 text=f"Voice note saved to inbox/{filename}\n\n--- Transcription ---\n{transcription}"
+            )]
+
+        except Exception as e:
+            cleanup_temp_files(temp_audio)
+            return [TextContent(type="text", text=f"Error: {e}")]
+
+    elif name == "listen":
+        # Create temp file for audio
+        fd, temp_audio = tempfile.mkstemp(suffix=".wav")
+        os.close(fd)
+
+        try:
+            # Start recording
+            print("\n🎙️  Listening... press Enter when done\n", file=sys.stderr)
+
+            process = subprocess.Popen(
+                ["arecord", "-f", "cd", "-t", "wav", "-q", temp_audio],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+            # Block waiting for Enter
+            input()
+
+            # Stop recording
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except:
+                process.kill()
+
+            print("⏳ Transcribing...", file=sys.stderr)
+
+            # Check if audio file exists and has content
+            if not os.path.exists(temp_audio) or os.path.getsize(temp_audio) < 1000:
+                cleanup_temp_files(temp_audio)
+                return [TextContent(type="text", text="Error: No audio captured or recording too short.")]
+
+            # Transcribe
+            transcription = transcribe_audio(temp_audio)
+
+            # Cleanup temp files
+            cleanup_temp_files(temp_audio)
+
+            if not transcription:
+                return [TextContent(type="text", text="Error: Transcription failed or no speech detected.")]
+
+            # Return transcription as user input for Claude to process
+            return [TextContent(
+                type="text",
+                text=f"[Voice input from user]: {transcription}"
             )]
 
         except Exception as e:

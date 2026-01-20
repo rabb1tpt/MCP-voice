@@ -43,13 +43,18 @@ The `record_voice_note` tool will be available.
 | `WHISPER_VENV` | Path to Whisper virtual environment | `~/code/openai-whisper/.venv` |
 | `WHISPER_MODEL` | Whisper model to use | `base` |
 
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `record_voice_note` | Record, transcribe, and save to vault inbox |
+| `listen` | Record, transcribe, and return as input for Claude to process |
+
 ## Usage
 
 In Claude Code:
-- "record Bitcoin thoughts"
-- "record meeting notes"
-
-The transcription saves to `{VAULT_DIR}/inbox/voice-{title}.md`.
+- "record Bitcoin thoughts" - saves transcription to inbox
+- "listen" - speak your request, Claude processes it
 
 ## Dependencies
 
