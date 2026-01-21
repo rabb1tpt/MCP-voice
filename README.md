@@ -1,13 +1,13 @@
-# MCP-voice-notes
+# MCP-voice
 
-An MCP server that records voice notes, transcribes them with Whisper, and saves to a vault inbox.
+An MCP server for voice input - record voice notes or speak commands for Claude to process.
 
 ## Setup
 
 ### 1. Create virtual environment
 
 ```bash
-cd ~/Bruno/code/MCP-voice-notes
+cd ~/Bruno/code/MCP-voice
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -20,9 +20,9 @@ Add a `.mcp.json` file in your project root:
 ```json
 {
   "mcpServers": {
-    "voice-notes": {
-      "command": "/home/rabb1tl0ka/Bruno/code/MCP-voice-notes/.venv/bin/python",
-      "args": ["/home/rabb1tl0ka/Bruno/code/MCP-voice-notes/server.py"],
+    "voice": {
+      "command": "/path/to/MCP-voice/.venv/bin/python",
+      "args": ["/path/to/MCP-voice/server.py"],
       "env": {
         "VAULT_DIR": "/path/to/your/vault"
       }
@@ -33,7 +33,7 @@ Add a `.mcp.json` file in your project root:
 
 ### 3. Restart Claude Code
 
-The `record_voice_note` tool will be available.
+The voice tools will be available.
 
 ## Environment Variables
 
